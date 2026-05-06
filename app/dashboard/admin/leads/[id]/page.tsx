@@ -7,6 +7,7 @@ import Modal from '@/components/ui/Modal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
 import LeadForm from '@/components/leads/LeadForm'
 import { ArrowLeft, Phone, MessageCircle, Mail, MapPin, Calendar, Edit, Trash2, UserCheck, Clock, AlertCircle } from 'lucide-react'
+import AISuggestions from '@/components/leads/AISuggestions'
 import toast from 'react-hot-toast'
 import {
   formatBudget, formatDate, formatDateTime, getWhatsAppUrl,
@@ -293,6 +294,9 @@ export default function AdminLeadDetailPage() {
                   {lead.followUpDate ? 'Update Follow-up' : 'Set Follow-up'}
                 </button>
               </div>
+
+              {/* AI Suggestions */}
+              <AISuggestions leadId={id as string} />
 
               {/* Quick stats */}
               <div className="card bg-gradient-to-br from-crm-navy to-crm-purple text-white">

@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import Modal from '@/components/ui/Modal'
 import { ArrowLeft, Phone, MessageCircle, Mail, MapPin, Calendar, Clock, AlertCircle } from 'lucide-react'
+import AISuggestions from '@/components/leads/AISuggestions'
 import toast from 'react-hot-toast'
 import {
   formatBudget, formatDate, formatDateTime, getWhatsAppUrl,
@@ -298,6 +299,8 @@ export default function AgentLeadDetailPage() {
                   {lead.followUpDate ? 'Update' : 'Set Follow-up'}
                 </button>
               </div>
+
+              <AISuggestions leadId={id as string} />
 
               <div className="card bg-gradient-crm text-white">
                 <p className="text-white/80 text-sm font-medium mb-2">Lead Score</p>

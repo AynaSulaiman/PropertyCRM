@@ -7,9 +7,10 @@ import LeadForm from '@/components/leads/LeadForm'
 import AssignLeadModal from '@/components/leads/AssignLeadModal'
 import Modal from '@/components/ui/Modal'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
-import { Plus, Download, Grid, List, Building2 } from 'lucide-react'
+import { Plus, Download, Grid, List, Building2, FileSpreadsheet, FileText } from 'lucide-react'
 import toast from 'react-hot-toast'
 import type { Lead } from '@/types'
+import { exportLeadsToPDF } from '@/lib/pdfExport'
 import { useSocket } from '@/hooks/useSocket'
 import { useAuth } from '@/hooks/useAuth'
 import { formatBudget, getStatusClass, getPriorityClass, formatDate, getWhatsAppUrl, isOverdue } from '@/lib/utils'
@@ -92,6 +93,32 @@ export default function AdminLeadsPage() {
     }
   }
 
+  const exportToExcel = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (filters.status) params.set('status', filters.status)
+      if (filters.priority) params.set('priority', filters.priority)
+      const res = await fetch(`/api/leads/export?format=excel&${params}`)
+      if (!res.ok) { toast.error('Export failed'); return }
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `PropertyCRM-Leads-${new Date().toISOString().slice(0, 10)}.xlsx`
+      a.click()
+      URL.revokeObjectURL(url)
+      toast.success('Exported to Excel (.xlsx)')
+    } catch { toast.error('Export failed') }
+  }
+
+  const exportToPDF = async () => {
+    try {
+      toast('Generating PDF...', { icon: '📄' })
+      await exportLeadsToPDF(leads)
+      toast.success('PDF downloaded')
+    } catch { toast.error('PDF export failed') }
+  }
+
   const exportToCSV = () => {
     const headers = ['Name', 'Phone', 'Email', 'Property Interest', 'Location', 'Budget', 'Status', 'Priority', 'Score', 'Source', 'Agent', 'Created']
     const rows = leads.map((l) => [
@@ -121,7 +148,13 @@ export default function AdminLeadsPage() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={exportToCSV} className="btn-secondary text-sm flex items-center gap-2">
-              <Download size={16} /> Export CSV
+              <Download size={16} /> CSV
+            </button>
+            <button onClick={exportToExcel} className="btn-secondary text-sm flex items-center gap-2">
+              <FileSpreadsheet size={16} /> Excel
+            </button>
+            <button onClick={exportToPDF} className="btn-secondary text-sm flex items-center gap-2">
+              <FileText size={16} /> PDF
             </button>
             <div className="flex bg-white border border-crm-silver rounded-lg overflow-hidden">
               <button onClick={() => setViewMode('table')} className={cn('p-2 transition-colors', viewMode === 'table' ? 'bg-crm-purple text-white' : 'text-gray-400 hover:text-crm-purple')}>
